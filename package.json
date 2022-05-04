@@ -1,0 +1,37 @@
+{
+  "name": "betterpointer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "build": "webpack --config webpack.prod.js",
+    "compile": "webpack --config webpack.dev.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LemonOrangeWasTaken/BetterPointer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LemonOrangeWasTaken/BetterPointer/issues"
+  },
+  "homepage": "https://github.com/LemonOrangeWasTaken/BetterPointer#readme",
+  "dependencies": {
+    "@types/animejs": "^3.1.4",
+    "animejs": "^3.2.1",
+    "path": "^0.12.7",
+    "speed-measure-webpack-plugin": "^1.5.0",
+    "ts-loader": "^9.3.0",
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-merge": "^5.8.0"
+  },
+  "devDependencies": {
+    "sass": "^1.51.0"
+  }
+}

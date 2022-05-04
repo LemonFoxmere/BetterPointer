@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Pointer Demo</title>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="./assets/css/main.css">
+    <link rel="stylesheet" href="./assets/css/font.css">
+    <link rel="stylesheet" href="./assets/css/cursorLib.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@100;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/firacode@6.2.0/distr/fira_code.css"> 
+</head>
+<body style="display: grid;">
+
+    <!-- ================== TITLE & SIDE BUTTONS ================== -->
+    <section style="width:100%; height:fit-content; align-self: center; justify-self: center; display:flex; justify-content: center;">
+        <!-- ================== BUTTONS ================== -->
+        <section style="margin-right: 4rem; height: fit-content">
+            <div class="app-icon"
+                 style="background-image: url('./assets/img/ras/lo.png'); background-size: 220%;"></div>
+
+            <hr>
+            
+            <div class="app-icon"
+                 style="background-image: url('./assets/img/ras/cat.png'); background-size: 160%;"></div>
+            <div class="app-icon"
+                 style="background-image: url('./assets/img/ras/udacity.png'); background-size: 60%;"></div>
+            <div class="app-icon"
+                 style="background-image: url('./assets/img/ras/firebase.png'); background-size: 50%;"></div>
+        </section>
+
+        <!-- ================== TITLE ================== -->
+        <section style="width: min(35rem, 50%); height:100%; top:0; background-color: transparent; display: grid; align-items: flex-start; flex-direction: column; margin-top:1.1rem">
+            <h1>Hi mom</h1>
+    
+            <hr style="width: 10rem;">
+    
+            <p>
+                Bacon ipsum dolor amet swine corned beef chicken cupim filet mignon ball tip salami tail pancetta tenderloin. Tail shank pancetta ribeye rump beef.
+            </p>
+            <p>
+                Pancetta short ribs drumstick ham hock tail cupim bacon picanha. Hamburger filet mignon tenderloin kevin burgdoggen ribeye.
+            </p>
+
+            <!-- input box -->
+            <section class="input-box" style="width: 100%; height: fit-content; margin-top:1.5rem">
+                <input class="input-ele" type="text" style="align-self: flex-end;" placeholder=" ">
+                <p style="white-space: nowrap;">★ Type Something Here</p>
+            </section>
+        </section>
+    </section>
+
+    <!-- ================== SIDE MENUS ================== -->
+    <section style="position: fixed; height: 100%; width: 18rem; background-color: #1f1f1fcb; left:-18rem; backdrop-filter: blur(13px); box-shadow: 0 0 5rem #00000034;">
+
+    </section>
+    <!-- ================== SIDE MENU BTN ================== -->
+    <section id="side-menu-container" style="position: fixed; left:20pt; top:20pt; display: flex; align-items: center; z-index: 999">
+        <img id="side-menu-btn" src="./assets/img/vec/menu-btn.svg" alt="Open side menu" style="width: 22pt; padding: 0.5rem; cursor:pointer;" ondragstart="return false">
+        
+        <section id="side-menu-control-container" style="display: flex; align-items: center;">
+            <img id="dark-mode-btn" src="./assets/img/vec/lightmode-btn.svg" alt="Toggle light mode" style="width: 22pt; padding: 0.5rem; margin-left: 8pt; cursor:pointer;" ondragstart="return false">
+
+            <h5 id="side-menu-label" class="unselectable" style="margin-left:10pt; font-weight: 500; font-family: Sora; font-variation-settings: 'wght' 200;">Better Cursor</h5>
+        </section>
+
+    </section>
+    <!-- actual side menu -->
+    <section id="side-menu" style="width: 220pt; height:100vh; position: fixed; left:0; top:0; transform: translateX(-240pt);">
+        <div id="title"></div>
+        <section style="width:95%; height:100%; padding-left:5%; overflow-y: auto;">
+            <h5 class="subtitle" style="margin:10pt 0 0 0">Category #1</h5>
+            <p class="items"><span style="display:inline-block; color:hsl(30,100%,50%); font-weight:800; width:20pt; text-align:center">⌘</span> macOS be like</p>
+            <p class="items"><span style="display:inline-block; color:hsl(30,100%,50%); font-weight:800; width:20pt; text-align:center">☭</span> capitalism is cringe</p>
+            <p class="items"><span style="display:inline-block; color:hsl(30,100%,50%); font-weight:800; width:20pt; text-align:center">♠</span> r/aaaaaaacccccccce</p>
+            <p class="items"><span style="display:inline-block; color:hsl(30,100%,50%); font-weight:800; width:20pt; text-align:center">⚛</span> reactJS (use vue)</p>
+    
+            <h5 class="subtitle">Category #2</h5>
+            <p class="items"><span style="display:inline-block; color:hsl(30,100%,50%); font-weight:800; width:20pt; text-align:center">⌬</span> methamphetamine</p>
+            <p class="items"><span style="display:inline-block; color:hsl(30,100%,50%); font-weight:800; width:20pt; text-align:center">☢</span> chernobyl</p>
+            <p class="items"><span style="display:inline-block; color:hsl(30,100%,50%); font-weight:800; width:20pt; text-align:center">★</span> you</p>
+    
+            <h5 class="subtitle">Category #3</h5>
+            <p class="items"><span style="display:inline-block; color:hsl(30,100%,50%); font-weight:800; width:20pt; text-align:center">⚧</span> very cool people</p>
+            <p class="items"><span style="display:inline-block; color:hsl(30,100%,50%); font-weight:800; width:20pt; text-align:center">≡</span> ew, javascript</p>
+        </section>
+
+    </section>
+
+    <script defer src="./bund/app.bundle.js"></script>
+</body>
+</html>
