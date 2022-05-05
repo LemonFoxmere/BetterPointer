@@ -1,9 +1,10 @@
 import anime from "animejs";
+import cursor from "./betterCursor"
 
 export let menu_opened:boolean = false;
 export let is_dark_mode:boolean = false;
 
-const init_UI = ():void => {
+const init_UI = (cur?:cursor):void => {
     // init side bar
     document.getElementById("side-menu-btn")!.addEventListener("click", (e:MouseEvent):void => {
         menu_opened = !menu_opened;
@@ -32,12 +33,14 @@ const init_UI = ():void => {
         is_dark_mode = !is_dark_mode;
         if(is_dark_mode){
             document.querySelector("body")!.classList.add("dark-mode");
+            cur!.setDark();
         } else{
             document.querySelector("body")!.classList.remove("dark-mode");
+            cur!.setLight();
         }
     });
 }
 
 window.onload = () => {
-    init_UI();
+    init_UI(new cursor("custom-cursor"));
 }
