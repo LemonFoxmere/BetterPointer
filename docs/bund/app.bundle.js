@@ -1401,6 +1401,7 @@ class cursor {
         this.dark = false;
         this.cx = 0;
         this.cy = 0;
+        this.snapCoef = 10;
         this._updateCursorState = () => {
             if (this._currentHoverElmnt.hasAttribute("snaptext"))
                 this.setShape("text");
@@ -1409,7 +1410,7 @@ class cursor {
             else if (this._currentHoverElmnt.hasAttribute("snapbutton"))
                 this.setShape("button");
             else if (this._currentHoverElmnt.hasAttribute("bigsnapbutton"))
-                this.setShape("button", this._currentHoverElmnt, true);
+                this.setShape("button", this._currentHoverElmnt, true, 20);
             else
                 this.setShape("");
         };
@@ -1421,9 +1422,9 @@ class cursor {
                 let bbox = this._currentSnapElmnt.getBoundingClientRect();
                 const offsetX = e.x - bbox.x - bbox.width / 2 + 4;
                 const offsetY = e.y - bbox.y - bbox.height / 2 + 4;
-                this.cursorElement.style.transform = `translate3d(${this.snappedX ? bbox.x + offsetX / (bbox.width / 5) + 2 : e.x}px, ${this.snappedY ? bbox.y + offsetY / (bbox.height / 5) + 2 : e.y}px, 0)`;
+                this.cursorElement.style.transform = `translate3d(${this.snappedX ? bbox.x + offsetX / (bbox.width / this.snapCoef) + 4 : e.x}px, ${this.snappedY ? bbox.y + offsetY / (bbox.height / this.snapCoef) + 4 : e.y}px, 0)`;
                 if (this.moveElmnt)
-                    this._currentSnapElmnt.style.transform = `translate3d(${this.snappedX ? offsetX / (bbox.width / 5) : 0}px, ${this.snappedY ? offsetY / (bbox.height / 5) : 0}px, 0)`;
+                    this._currentSnapElmnt.style.transform = `translate3d(${this.snappedX ? offsetX / (bbox.width / this.snapCoef) : 0}px, ${this.snappedY ? offsetY / (bbox.height / this.snapCoef) : 0}px, 0)`;
                 setTimeout(() => {
                     this._lastSnapElmnt.style.transition = "0ms ease";
                 }, 200);
@@ -1440,7 +1441,7 @@ class cursor {
                 this.dark = false;
             this.cursorElement.style.backgroundColor = (this.snappedX || this.snappedY) ? "hsla(0, 0%, 0%, 0.1)" : "hsla(0, 0%, 0%, 0.4)";
         };
-        this.setShape = (shape, elmnt = this._currentHoverElmnt, hideCursor = false) => {
+        this.setShape = (shape, elmnt = this._currentHoverElmnt, hideCursor = false, snapCoef = 10) => {
             const set_snap = () => {
                 this._currentSnapElmnt = elmnt;
                 if (this._currentSnapElmnt != this._lastSnapElmnt && !!this._lastSnapElmnt) {
@@ -1451,11 +1452,12 @@ class cursor {
                 this._lastSnapElmnt = this._currentSnapElmnt;
             };
             this.hidden = hideCursor;
+            this.snapCoef = snapCoef;
             switch (shape) {
                 case "text":
                     this.snappedX = this.snappedY = false;
                     this.moveElmnt = true;
-                    this.currentCursorWidth = `calc(${window.getComputedStyle(elmnt).lineHeight} / 12)`;
+                    this.currentCursorWidth = `max(3px, calc(${window.getComputedStyle(elmnt).lineHeight} / 12))`;
                     this.currentCursorHeight = window.getComputedStyle(elmnt).lineHeight;
                     if (hideCursor)
                         this.cursorElement.style.opacity = "0";
@@ -1557,7 +1559,7 @@ class cursor {
         };
         setInterval(() => {
             this._currentHoverElmnt = document.elementFromPoint(this.cx, this.cy);
-            if (this._currentHoverElmnt != this._lastHoverElmnt && !!this._currentHoverElmnt) {
+            if (this._currentHoverElmnt != this._lastHoverElmnt) {
                 if (this._currentHoverElmnt.hasAttribute("contrast"))
                     this.dark ? this.setLight(false) : this.setDark(false);
                 else
