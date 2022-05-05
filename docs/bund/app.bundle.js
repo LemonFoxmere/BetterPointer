@@ -1393,8 +1393,11 @@ window.onload = () => {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 class cursor {
-    constructor(id, size = "24px", mass = 75, trackingPeriod = 100) {
-        this.snapped = false;
+    constructor(id, size = "24px", mass = 75, trackingPeriod = 50) {
+        this.snappedX = false;
+        this.snappedY = false;
+        this.moveElmnt = true;
+        this.hidden = false;
         this.dark = false;
         this.cx = 0;
         this.cy = 0;
@@ -1402,7 +1405,7 @@ class cursor {
             if (this._currentHoverElmnt.hasAttribute("snaptext"))
                 this.setShape("text");
             else if (this._currentHoverElmnt.hasAttribute("snapinput"))
-                this.setShape("input");
+                this.setShape("input", this._currentHoverElmnt);
             else if (this._currentHoverElmnt.hasAttribute("snapbutton"))
                 this.setShape("button");
             else if (this._currentHoverElmnt.hasAttribute("bigsnapbutton"))
@@ -1411,40 +1414,48 @@ class cursor {
                 this.setShape("");
         };
         this._updatePositioncycle = (e) => {
-            if (!this.snapped) {
+            if (!(this.snappedX || this.snappedY)) {
                 this.cursorElement.style.transform = `translate3d(calc(${e.x}px - ${this.currentCursorWidth} / 2 - 2px), calc(${e.y}px - ${this.currentCursorHeight} / 2 - 2px),0)`;
             }
             else {
                 let bbox = this._currentSnapElmnt.getBoundingClientRect();
                 const offsetX = e.x - bbox.x - bbox.width / 2 + 4;
                 const offsetY = e.y - bbox.y - bbox.height / 2 + 4;
-                this.cursorElement.style.transform = `translate3d(${bbox.x + offsetX / (bbox.width / 15)}px, ${bbox.y + offsetY / (bbox.height / 15)}px, 0)`;
-                this._currentSnapElmnt.style.transform = `translate3d(${offsetX / (bbox.width / 5)}px, ${offsetY / (bbox.height / 5)}px, 0)`;
+                this.cursorElement.style.transform = `translate3d(${this.snappedX ? bbox.x + offsetX / (bbox.width / 5) + 2 : e.x}px, ${this.snappedY ? bbox.y + offsetY / (bbox.height / 5) + 2 : e.y}px, 0)`;
+                if (this.moveElmnt)
+                    this._currentSnapElmnt.style.transform = `translate3d(${this.snappedX ? offsetX / (bbox.width / 5) : 0}px, ${this.snappedY ? offsetY / (bbox.height / 5) : 0}px, 0)`;
                 setTimeout(() => {
                     this._lastSnapElmnt.style.transition = "0ms ease";
-                }, 50);
+                }, 200);
             }
             requestAnimationFrame(() => { });
         };
         this.setDark = (set = true) => {
             if (set)
                 this.dark = true;
-            this.cursorElement.style.backgroundColor = "hsla(0, 0%, 100%, 0.3)";
-            this.cursorElement.style.border = "1px solid";
-            this.cursorElement.style.borderColor = "hsla(0, 0%, 100%, 0.15)";
+            this.cursorElement.style.backgroundColor = (this.snappedX || this.snappedY) ? "hsla(0, 0%, 100%, 0.1)" : "hsla(0, 0%, 100%, 0.4)";
         };
         this.setLight = (set = true) => {
             if (set)
                 this.dark = false;
-            this.cursorElement.style.backgroundColor = "hsla(0, 0%, 0%, 0.3)";
-            this.cursorElement.style.border = "1px solid";
-            this.cursorElement.style.borderColor = "hsla(0, 0%, 0%, 0.15)";
+            this.cursorElement.style.backgroundColor = (this.snappedX || this.snappedY) ? "hsla(0, 0%, 0%, 0.1)" : "hsla(0, 0%, 0%, 0.4)";
         };
         this.setShape = (shape, elmnt = this._currentHoverElmnt, hideCursor = false) => {
+            const set_snap = () => {
+                this._currentSnapElmnt = elmnt;
+                if (this._currentSnapElmnt != this._lastSnapElmnt && !!this._lastSnapElmnt) {
+                    this._lastSnapElmnt.style.transition = "200ms ease";
+                    this._lastSnapElmnt.style.transform = "translate3d(0,0,0)";
+                    this._lastSnapElmnt.style.scale = "1";
+                }
+                this._lastSnapElmnt = this._currentSnapElmnt;
+            };
+            this.hidden = hideCursor;
             switch (shape) {
                 case "text":
-                    this.snapped = false;
-                    this.currentCursorWidth = `1.5px`;
+                    this.snappedX = this.snappedY = false;
+                    this.moveElmnt = true;
+                    this.currentCursorWidth = `calc(${window.getComputedStyle(elmnt).lineHeight} / 12)`;
                     this.currentCursorHeight = window.getComputedStyle(elmnt).lineHeight;
                     if (hideCursor)
                         this.cursorElement.style.opacity = "0";
@@ -1454,9 +1465,11 @@ class cursor {
                         this.cursorElement.style.backgroundColor = "hsla(0, 0%, 0%, 0.7)";
                     break;
                 case "input":
-                    this.snapped = false;
-                    this.currentCursorWidth = `1.5px`;
-                    this.currentCursorHeight = window.getComputedStyle(elmnt).height;
+                    this.snappedX = this.moveElmnt = false;
+                    this.snappedY = true;
+                    set_snap();
+                    this.currentCursorWidth = `3px`;
+                    this.currentCursorHeight = `calc(${window.getComputedStyle(elmnt).height} - 3px)`;
                     if (hideCursor)
                         this.cursorElement.style.opacity = "0";
                     if (this.dark)
@@ -1465,33 +1478,28 @@ class cursor {
                         this.cursorElement.style.backgroundColor = "hsla(0, 0%, 0%, 0.4)";
                     break;
                 case "button":
-                    this.snapped = true;
+                    this.snappedX = this.snappedY = true;
+                    this.moveElmnt = true;
                     this.currentCursorWidth = `${elmnt?.getBoundingClientRect().width}px`;
                     this.currentCursorHeight = `${elmnt?.getBoundingClientRect().height}px`;
                     this.currentCursorRadius = window.getComputedStyle(elmnt).borderRadius;
                     this.cursorElement.style.zIndex = "0";
-                    this._currentSnapElmnt = elmnt;
-                    if (this._currentSnapElmnt != this._lastSnapElmnt && !!this._lastSnapElmnt) {
-                        this._lastSnapElmnt.style.transition = "200ms ease";
-                        this._lastSnapElmnt.style.transform = "translate3d(0,0,0)";
-                        this._lastSnapElmnt.style.scale = "1";
-                    }
-                    this._lastSnapElmnt = this._currentSnapElmnt;
+                    set_snap();
                     this._currentSnapElmnt.style.transitionProperty = "scale, transform";
                     this._currentSnapElmnt.style.transition = `${this.cursorMass || 0 + 100}ms ease`;
-                    this._currentSnapElmnt.style.scale = "1.1";
+                    this._currentSnapElmnt.style.scale = "1.15";
                     if (hideCursor) {
                         this.cursorElement.style.opacity = "0";
                         break;
                     }
-                    this.cursorElement.style.borderColor = "hsla(0, 0%, 0%, 0)";
                     if (this.dark)
-                        this.cursorElement.style.backgroundColor = "hsla(0, 0%, 100%, 0.2)";
+                        this.cursorElement.style.backgroundColor = "hsla(0, 0%, 100%, 0.1)";
                     else
                         this.cursorElement.style.backgroundColor = "hsla(0, 0%, 0%, 0.1)";
                     break;
                 default:
-                    this.snapped = false;
+                    this.snappedX = this.snappedY = false;
+                    this.moveElmnt = true;
                     this.currentCursorRadius = this.cursorWidth;
                     this.currentCursorWidth = this.cursorWidth;
                     this.currentCursorHeight = this.cursorHeight;
@@ -1534,11 +1542,15 @@ class cursor {
             this.cursorElement.style.width = this.currentCursorWidth;
             this.cursorElement.style.height = this.currentCursorHeight;
             this.cursorElement.style.borderRadius = this.currentCursorRadius;
-            this.cursorElement.style.backgroundColor = "hsla(0, 0%, 0%, 0.3)";
-            this.cursorElement.style.border = "1px solid";
-            this.cursorElement.style.borderColor = "hsla(0, 0%, 0%, 0.15)";
+            this.cursorElement.style.opacity = "0";
+            this.cursorElement.style.backgroundColor = "hsla(0, 0%, 0%, 0.4)";
         }
+        document.documentElement.addEventListener('mouseleave', () => this.cursorElement.style.opacity = "0");
+        document.documentElement.addEventListener('keydown', () => this.cursorElement.style.opacity = "0");
+        document.documentElement.addEventListener('mouseenter', () => this.cursorElement.style.opacity = "1");
         document.onmousemove = (e) => {
+            if (!this.hidden)
+                this.cursorElement.style.opacity = "1";
             this.cx = e.x;
             this.cy = e.y;
             this._updatePositioncycle(e);

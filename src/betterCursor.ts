@@ -17,12 +17,15 @@ export default class cursor{
     private _lastHoverElmnt:HTMLElement | undefined;
     private _currentHoverElmnt:HTMLElement | undefined;
 
-    snapped:boolean = false;
+    snappedX:boolean = false;
+    snappedY:boolean = false;
+    moveElmnt:boolean = true;
+    hidden:boolean = false;
 
     dark:boolean = false;
     cx:number = 0; cy:number = 0;
 
-    constructor(id:string, size:string="24px", mass:number=75, trackingPeriod:number=100){
+    constructor(id:string, size:string="24px", mass:number=75, trackingPeriod:number=50){
         this.cursorElement = document.getElementById(id)!;
         if(!this.cursorElement){
             console.error(`Cursor with id:${id} does not exist.`);
@@ -49,15 +52,21 @@ export default class cursor{
             this.cursorElement.style.width = this.currentCursorWidth; // set width
             this.cursorElement.style.height = this.currentCursorHeight; // set height
             this.cursorElement.style.borderRadius = this.currentCursorRadius; // set cursor radius
+            this.cursorElement.style.opacity = "0"; // set cursor radius
             
             // initial coloring
-            this.cursorElement.style.backgroundColor = "hsla(0, 0%, 0%, 0.3)"; // background color
-            this.cursorElement.style.border = "1px solid"; // border size
-            this.cursorElement.style.borderColor = "hsla(0, 0%, 0%, 0.15)"; // border color
+            this.cursorElement.style.backgroundColor = "hsla(0, 0%, 0%, 0.4)"; // background color
         }
+
+        // make it so that the cursor hides when the real cursor leaves
+        document.documentElement.addEventListener('mouseleave', () => this.cursorElement!.style.opacity = "0");
+        document.documentElement.addEventListener('keydown', () => this.cursorElement!.style.opacity = "0");
+        document.documentElement.addEventListener('mouseenter', () => this.cursorElement!.style.opacity = "1");
 
         // start tracking the real cursor
         document.onmousemove = (e:MouseEvent):void => {
+            if(!this.hidden) this.cursorElement!.style.opacity = "1";
+
             this.cx=e.x; this.cy=e.y;
             
             // update positioning of the cursor
@@ -80,14 +89,14 @@ export default class cursor{
 
     private _updateCursorState = ():void => {
         if(this._currentHoverElmnt!.hasAttribute("snaptext")) this.setShape("text");
-        else if (this._currentHoverElmnt!.hasAttribute("snapinput")) this.setShape("input");
+        else if (this._currentHoverElmnt!.hasAttribute("snapinput")) this.setShape("input", this._currentHoverElmnt);
         else if (this._currentHoverElmnt!.hasAttribute("snapbutton")) this.setShape("button");
         else if (this._currentHoverElmnt!.hasAttribute("bigsnapbutton")) this.setShape("button", this._currentHoverElmnt, true);
         else this.setShape("");
     }
 
     private _updatePositioncycle = (e:MouseEvent):void => {
-        if(!this.snapped){ // if there is no snappable element, track the cursor as usual
+        if(!(this.snappedX || this.snappedY)){ // if there is no snappable element, track the cursor as usual
             this.cursorElement!.style.transform = `translate3d(calc(${e.x}px - ${this.currentCursorWidth} / 2 - 2px), calc(${e.y}px - ${this.currentCursorHeight} / 2 - 2px),0)`; // border size
         } else { // if there is, then manipulate margins to offset the cursor
             // calculate the offset distance from cursor to the element's center
@@ -95,12 +104,12 @@ export default class cursor{
             const offsetX = e.x - bbox.x - bbox.width/2 + 4;
             const offsetY = e.y - bbox.y - bbox.height/2 + 4;
             
-            this.cursorElement!.style.transform = `translate3d(${bbox.x + offsetX/(bbox.width/15)}px, ${bbox.y + offsetY/(bbox.height/15)}px, 0)`; // border size
-            this._currentSnapElmnt!.style.transform = `translate3d(${offsetX/(bbox.width/5)}px, ${offsetY/(bbox.height/5)}px, 0)`; // border size
+            this.cursorElement!.style.transform = `translate3d(${ this.snappedX ? bbox.x + offsetX/(bbox.width/5) + 2 : e.x }px, ${ this.snappedY ? bbox.y + offsetY/(bbox.height/5) + 2 : e.y}px, 0)`; // border size
+            if(this.moveElmnt) this._currentSnapElmnt!.style.transform = `translate3d(${ this.snappedX ? offsetX/(bbox.width/5) : 0 }px, ${ this.snappedY ? offsetY/(bbox.height/5) : 0}px, 0)`; // border size
             
             setTimeout(() => {
                 this._lastSnapElmnt!.style.transition = "0ms ease";
-            }, 50);
+            }, 200);
         }
 
         // update frame
@@ -109,24 +118,39 @@ export default class cursor{
 
     setDark = (set:boolean = true):void => {
         if(set) this.dark = true;
-        this.cursorElement!.style.backgroundColor = "hsla(0, 0%, 100%, 0.3)"; // background color
-        this.cursorElement!.style.border = "1px solid"; // border size
-        this.cursorElement!.style.borderColor = "hsla(0, 0%, 100%, 0.15)"; // border color
+        // if the cursor isn't snapped (aka normal state), change background color according to that
+        this.cursorElement!.style.backgroundColor = (this.snappedX || this.snappedY) ? "hsla(0, 0%, 100%, 0.1)" : "hsla(0, 0%, 100%, 0.4)";
+
     }
     setLight = (set:boolean = true):void => {
         if(set) this.dark = false;
-        this.cursorElement!.style.backgroundColor = "hsla(0, 0%, 0%, 0.3)"; // background color
-        this.cursorElement!.style.border = "1px solid"; // border size
-        this.cursorElement!.style.borderColor = "hsla(0, 0%, 0%, 0.15)"; // border color
+        // if the cursor isn't snapped (aka normal state), change background color according to that
+        this.cursorElement!.style.backgroundColor = (this.snappedX || this.snappedY) ? "hsla(0, 0%, 0%, 0.1)" : "hsla(0, 0%, 0%, 0.4)";
     }
     
     setShape = (shape:string, elmnt:HTMLElement=this._currentHoverElmnt!, hideCursor:boolean=false) => {
+
+        const set_snap = ():void => {
+            this._currentSnapElmnt = elmnt; // set the snapping element to the correct element
+
+            // reset last snapped element offset and scale (if it exists)
+            if(this._currentSnapElmnt != this._lastSnapElmnt && !!this._lastSnapElmnt){
+                this._lastSnapElmnt!.style.transition = "200ms ease";
+                this._lastSnapElmnt!.style.transform = "translate3d(0,0,0)"; // reset element scale            
+                this._lastSnapElmnt!.style.scale = "1";
+            }  
+
+            this._lastSnapElmnt = this._currentSnapElmnt; // set the last snapping element to the current element
+        }
+
+        this.hidden = hideCursor;
         switch(shape){
             case "text":
                 // set snapped state to true
-                this.snapped = false
+                this.snappedX = this.snappedY = false;
+                this.moveElmnt = true;
 
-                this.currentCursorWidth = `1.5px`; // set width
+                this.currentCursorWidth = `calc(${window.getComputedStyle(elmnt).lineHeight} / 12)`; // set width
                 this.currentCursorHeight = window.getComputedStyle(elmnt).lineHeight; // set width
 
                 if(hideCursor) this.cursorElement!.style.opacity = "0"; // hide cursor all together
@@ -135,10 +159,13 @@ export default class cursor{
                 break;
             case "input":
                 // set snapped state to true
-                this.snapped = false;
+                this.snappedX = this.moveElmnt = false;
+                this.snappedY = true;
 
-                this.currentCursorWidth = `1.5px`; // set width
-                this.currentCursorHeight = window.getComputedStyle(elmnt).height; // set width
+                set_snap();
+
+                this.currentCursorWidth = `3px`; // set width
+                this.currentCursorHeight = `calc(${window.getComputedStyle(elmnt).height} - 3px)`; // set width
 
                 if(hideCursor) this.cursorElement!.style.opacity = "0"; // hide cursor all together
                 if(this.dark) this.cursorElement!.style.backgroundColor = "hsla(0, 0%, 100%, 0.4)"; // background color
@@ -146,30 +173,22 @@ export default class cursor{
                 break;
             case "button":
                 // set snapped state to true
-                this.snapped = true;
+                this.snappedX = this.snappedY = true;
+                this.moveElmnt = true;
 
                 this.currentCursorWidth = `${elmnt?.getBoundingClientRect().width}px`; // set width
                 this.currentCursorHeight = `${elmnt?.getBoundingClientRect().height}px`; // set width
                 this.currentCursorRadius = window.getComputedStyle(elmnt).borderRadius; // set radius
 
                 this.cursorElement!.style.zIndex = "0"; // set z-index to the bottom (for highlighting)
-
-                this._currentSnapElmnt = elmnt; // set the snapping element to the correct element
                 
-                // reset last snapped element offset and scale (if it exists)
-                if(this._currentSnapElmnt != this._lastSnapElmnt && !!this._lastSnapElmnt){
-                    this._lastSnapElmnt!.style.transition = "200ms ease";
-                    this._lastSnapElmnt!.style.transform = "translate3d(0,0,0)"; // reset element scale            
-                    this._lastSnapElmnt!.style.scale = "1";
-                }  
-
-                this._lastSnapElmnt = this._currentSnapElmnt; // set the last snapping element to the current element
+                set_snap();
 
                 // set transition properties for easing
                 this._currentSnapElmnt!.style.transitionProperty = "scale, transform";
                 this._currentSnapElmnt!.style.transition = `${this.cursorMass || 0 + 100}ms ease`;
                 // scale up the hovered over element
-                this._currentSnapElmnt!.style.scale = "1.1";
+                this._currentSnapElmnt!.style.scale = "1.15";
 
                 // if the client request to hide the cursor, hide it all togehter
                 if(hideCursor){
@@ -177,12 +196,12 @@ export default class cursor{
                     break;
                 }
                 // hide the border and background color
-                this.cursorElement!.style.borderColor = "hsla(0, 0%, 0%, 0)";
-                if(this.dark) this.cursorElement!.style.backgroundColor = "hsla(0, 0%, 100%, 0.2)"; // dark mode bgc
+                if(this.dark) this.cursorElement!.style.backgroundColor = "hsla(0, 0%, 100%, 0.1)"; // dark mode bgc
                 else this.cursorElement!.style.backgroundColor = "hsla(0, 0%, 0%, 0.1)"; // light mode bgc
                 break;
             default:
-                this.snapped = false;
+                this.snappedX = this.snappedY = false;
+                this.moveElmnt = true;
 
                 this.currentCursorRadius = this.cursorWidth; // reset border radius
                 this.currentCursorWidth = this.cursorWidth; // set width
