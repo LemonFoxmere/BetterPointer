@@ -20,8 +20,10 @@
 </head>
 <body style="display: grid;">
 
+    <div id="custom-cursor"></div>
+
     <!-- ================== TITLE & SIDE BUTTONS ================== -->
-    <section style="width:100%; height:fit-content; align-self: center; justify-self: center; display:flex; justify-content: center;">
+    <section style="width:100%; height:fit-content; align-self: center; justify-self: center; display:flex; justify-content: center; z-index: 1;">
         <!-- ================== BUTTONS ================== -->
         <section style="margin-right: 4rem; height: fit-content">
             <div bigsnapbutton class="app-icon"
@@ -38,21 +40,21 @@
 
         <!-- ================== TITLE ================== -->
         <section style="width: min(35rem, 50%); height:100%; top:0; background-color: transparent; display: grid; align-items: flex-start; flex-direction: column; margin-top:1.1rem">
-            <h1 style="width:fit-content; padding-right: 14pt;" snaptext>Hi mom</h1>
+            <h1 style="width:fit-content; padding-right: 14pt; white-space: nowrap;" snaptext>What is this?</h1>
     
             <hr style="width: 10rem;">
     
             <p snaptext id="temp">
-                Bacon ipsum dolor amet swine corned beef chicken cupim filet mignon ball tip salami tail pancetta tenderloin. Tail shank pancetta ribeye rump beef.
+                This is a custom pointer that can adapt and snap to different elements, making controlling and interacting with them feel more natural.
             </p>
             <p snaptext>
-                Pancetta short ribs drumstick ham hock tail cupim bacon picanha. Hamburger filet mignon tenderloin kevin burgdoggen ribeye.
+                Almost everything you see on this page can be clicked on, but some won't do anything. To learn how to use this in your own project, visit the <a href="https://github.com/LemonOrangeWasTaken/BetterPointer" target="_blank" snapbutton growth="10px" style="border-radius: 7px; color: hsl(215, 90%, 55%); font-variation-settings: 'wght' 400;">GitHub</a>.
             </p>
 
             <!-- input box -->
             <section class="input-box" style="width: 100%; height: fit-content; margin-top:1.5rem">
                 <input class="input-ele" type="text" style="align-self: flex-end;" placeholder=" " snapinput>
-                <p style="white-space: nowrap;">★ Type Something Here</p>
+                <p style="white-space: nowrap;">★ A Snappy Input Box</p>
             </section>
         </section>
     </section>
@@ -68,13 +70,12 @@
         
         <section id="side-menu-control-container" style="display: flex; align-items: center;">
             <img id="dark-mode-btn" class="unselectable" src="./assets/img/vec/lightmode-btn.svg" alt="Toggle light mode" style="width: 22pt; padding: 1rem; border-radius:5pt" ondragstart="return false" snapbutton>
-
             <h5 id="side-menu-label" class="unselectable" style="margin-left:10pt; font-weight: 500; font-family: Sora; font-variation-settings: 'wght' 200;">Better Cursor <span style="font-variation-settings: 'wght' 600;">demo</span></h5>
         </section>
 
     </section>
     <!-- actual side menu -->
-    <section id="side-menu" style="width: 220pt; height:100vh; position: fixed; left:0; top:0; transform: translateX(-240pt);">
+    <section id="side-menu" style="width: 220pt; height:100vh; position: fixed; left:0; top:0; transform: translateX(-240pt); z-index: -1;">
         <div id="title"></div>
         <section style="width:95%; height:100%; padding-left:5%; overflow-y: auto; overflow-x: hidden;">
             <h5 snaptext class="subtitle" style="margin:10pt 0 10pt 0">Category #1</h5>
@@ -94,9 +95,6 @@
         </section>
 
     </section>
-
-    <div id="custom-cursor"></div>
-
     <script defer src="./bund/app.bundle.js"></script>
 </body>
 </html>

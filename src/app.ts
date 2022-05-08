@@ -1,5 +1,5 @@
 import anime from "animejs";
-import cursor from "./betterCursor"
+import cursor from "./betterCursor";
 
 export let menu_opened:boolean = false;
 export let is_dark_mode:boolean = false;
