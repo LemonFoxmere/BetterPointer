@@ -141,16 +141,18 @@ export default class cursor{
     
     setShape = (shape:string, elmnt:HTMLElement=this._currentHoverElmnt!, hideCursor:boolean=false, snapCoef=10) => {
         const reset_last_snap_pos = ():void => {
-            this._lastSnapElmnt!.style.transition = "200ms ease";
-            this._lastSnapElmnt!.style.transform = "translate3d(0,0,0)"; // reset element scale            
-            this._lastSnapElmnt!.style.scale = "1";
+            if(!!this._lastSnapElmnt){
+                this._lastSnapElmnt!.style.transition = "200ms ease";
+                this._lastSnapElmnt!.style.transform = "translate3d(0,0,0)"; // reset element scale            
+                this._lastSnapElmnt!.style.scale = "1";
+            }
         }
         const set_snap = ():void => { // call this function whenever an element that is snappable is hovered over on
             this._currentSnapElmnt = elmnt; // set the snapping element to the correct element
             this._currentSnapBbox = elmnt.getBoundingClientRect(); // set the bounding box so it doesnt change
 
             // reset last snapped element offset and scale (if it exists)
-            if(this._currentSnapElmnt != this._lastSnapElmnt && !!this._lastSnapElmnt){
+            if(this._currentSnapElmnt != this._lastSnapElmnt){
                 reset_last_snap_pos();
             }  
 
