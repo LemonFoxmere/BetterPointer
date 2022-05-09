@@ -1,6 +1,6 @@
 {
   "name": "betterpointer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "TS & JS Library for adaptive precision cursor in your project.",
   "files": [
     "dist"
@@ -29,7 +29,6 @@
     "typescript": "^4.6.4"
   },
   "devDependencies": {
-    "betterpointer": "^1.0.0",
     "path": "^0.12.7",
     "speed-measure-webpack-plugin": "^1.5.0",
     "ts-loader": "^9.3.0",
