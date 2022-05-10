@@ -1,6 +1,6 @@
 <div align="center" style="margin-top:1rem; font-family: Poppins">
     <a href="https://deepfusion.org" style="display:flex; justify-content:center; height:fit-content; padding:0; text-decoration:none; margin:0 0 0 0">
-        <img src="./docs/assets/img/ras/banner.png" width="400"></img>
+        <img src="./docs/assets/img/vec/banner.svg" width="400"></img>
     </a>
     <h3 style="font-family:Montserrat; font-weight:400; font-size:1.3rem; margin:0 0 1.5rem 0">Haha, cool cursor go brrrr...</h3>
 
