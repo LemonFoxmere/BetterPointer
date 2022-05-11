@@ -189,6 +189,8 @@ Here are some known issues about the library so far:
 1. Safari absolutely refuses to work with the web (as well as Internet Explorer).
 2. Does not work well with transitioning elements
 3. Random errors in the console sometimes
+4. Immense lag on opening up dev tools
+5. Poor behavior with mouse on demo page
 
 <h1 id="troubleshoot">Troubleshooting</h1>
 
